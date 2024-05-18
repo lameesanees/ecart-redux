@@ -9,13 +9,16 @@ import {
 import { FaHeart } from "react-icons/fa";
 import { FaCartPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
+import {useSelector} from "react-redux"
 function Header() {
+const wishlistArray = useSelector((state)=>state.wishlistReducer)
+const cartArray = useSelector((state)=>state.cartReducer)
+
   return (
-    <MDBNavbar dark bgColor="dark">
+    <MDBNavbar dark bgColor="dark" className="fixed-top">
       <MDBContainer fluid>
         <Link to={"/"} className="text-decoration-none">
-          <MDBNavbarBrand style={{ fontFamily: "cursive" }}>
+          <MDBNavbarBrand style={{ fontFamily:"sans-serif" }}>
             <img src="https://cdn-icons-png.flaticon.com/256/12441/12441386.png" className="img-fluid" style={{width:"10%"}} alt="" />
             EasyBuy.com
           </MDBNavbarBrand>
@@ -25,13 +28,13 @@ function Header() {
          <button className="btn btn-light rounded">
             {""}
             <FaHeart style={{ color: "red", fontSize: "20px" }} />{" "}
-            <span>0</span>
+            <span>{wishlistArray.length}</span>
           </button></Link>
           <Link to ={"/cart"}>
           <button className="btn btn-light rounded">
             {""}
             <FaCartPlus style={{ color: "black", fontSize: "20px" }} />{" "}
-            <span>0</span>
+            <span>{cartArray.length}</span>
           </button></Link>
         </MDBInputGroup>
       </MDBContainer>

@@ -1,91 +1,142 @@
-import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FaTrash, FaHeart } from "react-icons/fa";
+import { addToWishlist } from "../redux/slices/wishlistSlice";
+import { deleteFromCart, emptyCart } from "../redux/slices/cartSlice";
+import Swal from "sweetalert2";
+import {
+  MDBContainer,
+  MDBTable,
+  MDBTableBody,
+  MDBTableHead,
+  MDBBtn,
+} from "mdb-react-ui-kit";
+import { Link } from "react-router-dom";
 
 function Cart() {
-  const cartItems = [
-    { id: 1, name: 'Product 1', price: 100, quantity: 1, image: 'https://rukminim2.flixcart.com/image/850/1000/xif0q/bag/y/o/3/-original-imagrcjhpnnduhd6.jpeg?q=90&crop=false' }
-  ];
-  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const dispatch = useDispatch();
+  const cartArray = useSelector((state) => state.cartReducer);
+
+  const handleAddToWishlist = (product) => {
+    dispatch(addToWishlist(product));
+    dispatch(deleteFromCart(product.id));
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Added to Wishlist",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  };
+
+  const calculateTotal = () => {
+    return cartArray.reduce((total, product) => total + product.price, 0);
+  };
+
+  const handleEmptyCart = () => {
+    dispatch(emptyCart());
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Your Order has been placed!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  };
 
   return (
     <div
+      className="p-5 m-3"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: "#f5f5f5",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <h1 className="text-center text-danger">My Cart</h1>
-      <div
-        style={{
-          width: '80%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
-        {cartItems.map(item => (
-          <div
-            key={item.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#fff',
-              padding: '20px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <img
-              src={item.image}
-              alt={item.name}
+      <MDBContainer>
+        <h1 className="text-center text-danger mt-3 mb-5">My Cart</h1>
+        {cartArray?.length > 0 ? (
+          <div className="w-100">
+            <MDBTable responsive>
+              <MDBTableHead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </MDBTableHead>
+              <MDBTableBody>
+                {cartArray.map((product, index) => (
+                  <tr key={index}>
+                    <td>
+                      <img
+                        src={product.thumbnail}
+                        alt={product.title}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </td>
+                    <td>{product.description}</td>
+                    <td>{product.price}/-</td>
+                    <td>
+                      <MDBBtn
+                        color="danger"
+                        onClick={() => dispatch(deleteFromCart(product.id))}
+                        className="me-2"
+                      >
+                        <FaTrash />
+                      </MDBBtn>
+                      <MDBBtn
+                        color="warning"
+                        onClick={() => handleAddToWishlist(product)}
+                      >
+                        <FaHeart />
+                      </MDBBtn>
+                    </td>
+                  </tr>
+                ))}
+              </MDBTableBody>
+            </MDBTable>
+
+            <div
+              className="mt-4 p-3"
               style={{
-                width: '150px',
-                height: '150px',
-                objectFit: 'cover',
-                marginRight: '20px',
-                borderRadius: '8px',
-              }}
-            />
-            <div style={{ flex: '1' }}>
-              <h3>{item.name}</h3>
-              <p style={{ color: 'red' }}>${item.price}</p>
-              <p>Quantity: {item.quantity}</p>
-            </div>
-            <button
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#dc3545',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
+                width: "100%",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: "#fff",
               }}
             >
-              <FaTrash style={{ color: 'white', fontSize: '20px' }} />
-            </button>
+              <h3 className="text-center mb-4">Bill Summary</h3>
+              <div className="d-flex justify-content-between mb-3">
+                <strong>Total Items:</strong>
+                <span>{cartArray.length}</span>
+              </div>
+              <div className="d-flex justify-content-between">
+                <strong>Total Price:</strong>
+                <span>{calculateTotal()}/-</span>
+              </div>
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => handleEmptyCart()}
+                  className="btn btn-sm btn-success"
+                >
+                  Check Out
+                </button>
+              </div>
+            </div>
           </div>
-        ))}
-
-        <div
-          style={{
-            backgroundColor: '#fff',
-            padding: '20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            width: '100%',
-            textAlign: 'center',
-            marginTop: '20px',
-          }}
-        >
-          <h2>Cart Summary</h2>
-          <p>Total Items: {totalItems}</p>
-          <p>Total Price: ${totalPrice}</p>
-        </div>
-      </div>
+        ) : (
+          <p className="text-center">No products available</p>
+        )}
+      </MDBContainer>
     </div>
   );
 }

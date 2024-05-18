@@ -1,11 +1,34 @@
 import React from "react";
-import { FaCartPlus } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
-import { Link } from "react-router-dom";
-
+import { FaCartPlus, FaTrash } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  MDBRow,
+  MDBCol,
+  MDBCard,
+  MDBCardBody,
+  MDBCardTitle,
+  MDBCardText,
+  MDBCardImage,
+} from "mdb-react-ui-kit";
+import { deleteFromWishlist } from "../redux/slices/wishlistSlice";
+import { addToCart } from "../redux/slices/cartSlice";
 function Wishlist() {
+  const dispatch = useDispatch();
+  const wishlistArray = useSelector((state) => state.wishlistReducer);
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product));
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Added to Cart",
+      showConfirmButton: false,
+      timer: 1500
+    });
+  }
   return (
     <div
+      className="m-4 p-5"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -14,52 +37,58 @@ function Wishlist() {
         backgroundColor: "#f5f5f5",
       }}
     >
-      <h1 className="text-center text-danger">My Wishlist</h1>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
-            width: "300px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfZRR788bE_BRq-mFeHOiZcKLOmy5_dsUCHV3GxHZIew&s"
-            alt="Product 1"
-            style={{
-              width: "90%",
-              height: "250px",
-              objectFit: "cover",
-              marginBottom: "10px",
-              borderRadius: "8px",
-            }}
-          />
-          <h3>Handbag</h3>
-          <p style={{color:"red"}}>$100</p>
-          <div className="d-flex">
-            <button className="btn btn-lg">
-              <FaTrash style={{color:"red",fontSize:"20px"}} />
-            </button>
-            <Link to ={"/cart"}>
-            <button className="btn btn-lg">
-              <FaCartPlus style={{color:"black",fontSize:"20px"}}/>
-            </button></Link>
-          </div>
-        </div>
-      </div>
+      <h1 className="text-center text-danger m-2 mt-3 p-1">My Wishlist</h1>
+      <MDBRow className="row-cols-1 row-cols-md-3 g-4">
+        {wishlistArray?.length > 0 ? (
+          wishlistArray.map((product, index) => (
+            <MDBCol key={index} className="mb-3">
+              <MDBCard
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <MDBCardImage
+                  src={product.thumbnail}
+                  alt="..."
+                  position="top"
+                  className="img-fluid"
+                  style={{ height: "300px", objectFit: "cover" }}
+                />
+                <MDBCardBody
+                  className="d-flex flex-column"
+                  style={{ height: "100%" }}
+                >
+                  <MDBCardTitle>{product.title}</MDBCardTitle>
+                  <MDBCardText>{product.description}</MDBCardText>
+                  <div className="mt-auto d-flex justify-content-between align-items-center">
+                    <p style={{ color: "red", margin: 0 }}>{product.price}/-</p>
+                    <div>
+                      <button
+                        onClick={() => dispatch(deleteFromWishlist(product.id))}
+                        className="btn btn-lg"
+                        style={{ fontSize: "20px", color: "red" }}
+                      >
+                        <FaTrash />
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="btn btn-lg"
+                        style={{ fontSize: "20px", color: "black" }}
+                      >
+                        <FaCartPlus />
+                      </button>
+                    </div>
+                  </div>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+          ))
+        ) : (
+          <p>No products available</p>
+        )}
+      </MDBRow>
     </div>
   );
 }

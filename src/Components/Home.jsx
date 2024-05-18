@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import Items from './Items';
 function Home() {
   return (
+   <>
     <div style={{
       position: 'relative',
       height: '100vh', 
@@ -35,6 +36,10 @@ function Home() {
         </Link>
       </div>
     </div>
+    <div>
+      <Items/>
+    </div>
+   </>
   );
 }
 

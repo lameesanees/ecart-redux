@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const wishlistSlice = createSlice({
-    
   name: "wishlist",
   initialState: [],
   reducers: {
@@ -11,13 +10,26 @@ const wishlistSlice = createSlice({
     addToWishlist: (state, action) => {
       state.push(action.payload);
       Swal.fire({
-        title: 'Added to Wishlist!',
-        text: 'Do you want to continue',
-        icon: 'success',
-        confirmButtonText: 'Back'
-      })
+        position: "top-end",
+        icon: "success",
+        title: "Added To Wishlist",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    },
+    deleteFromWishlist: (state, action) => {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Removed from Wishlist",
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return state.filter((item) => item.id != action.payload);
+    
     },
   },
 });
-export const { addToWishlist } = wishlistSlice.actions;
-export default wishlistSlice.reducer
+
+export const { addToWishlist , deleteFromWishlist} = wishlistSlice.actions;
+export default wishlistSlice.reducer;
